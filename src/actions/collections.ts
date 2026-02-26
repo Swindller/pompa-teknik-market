@@ -1,10 +1,11 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, isSupabaseConfigured } from '@/lib/supabase/server'
 import { Collection, CollectionFormData } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
 export async function getCollections(): Promise<Collection[]> {
+  if (!isSupabaseConfigured()) return []
   const supabase = await createAdminClient()
   const { data, error } = await supabase
     .from('collections')

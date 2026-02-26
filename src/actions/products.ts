@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, isSupabaseConfigured } from '@/lib/supabase/server'
 import { Product, ProductFormData } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
@@ -18,6 +18,7 @@ export async function getProducts(params?: {
   page?: number
   pageSize?: number
 }): Promise<{ data: ProductWithRelations[]; count: number }> {
+  if (!isSupabaseConfigured()) return { data: [], count: 0 }
   const supabase = await createAdminClient()
 
   let query = supabase
@@ -58,6 +59,7 @@ export async function getProducts(params?: {
 }
 
 export async function getProductById(id: string): Promise<ProductWithRelations | null> {
+  if (!isSupabaseConfigured()) return null
   const supabase = await createAdminClient()
 
   const { data, error } = await supabase
@@ -78,6 +80,7 @@ export async function getProductById(id: string): Promise<ProductWithRelations |
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductWithRelations | null> {
+  if (!isSupabaseConfigured()) return null
   const supabase = await createAdminClient()
 
   const { data, error } = await supabase
@@ -283,6 +286,9 @@ export async function toggleProductActive(id: string, isActive: boolean): Promis
 }
 
 export async function getDashboardStats() {
+  if (!isSupabaseConfigured()) {
+    return { totalProducts: 0, activeProducts: 0, totalCategories: 0, totalCollections: 0, recentProducts: [], lowStock: [] }
+  }
   const supabase = await createAdminClient()
 
   const [

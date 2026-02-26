@@ -1,10 +1,11 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, isSupabaseConfigured } from '@/lib/supabase/server'
 import { Category, CategoryFormData } from '@/lib/types'
 import { revalidatePath } from 'next/cache'
 
 export async function getCategories(): Promise<Category[]> {
+  if (!isSupabaseConfigured()) return []
   const supabase = await createAdminClient()
   const { data, error } = await supabase
     .from('categories')
